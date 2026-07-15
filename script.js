@@ -2316,29 +2316,6 @@ function saveExtras() {
         wirdTime: '21:00'
     };
 
-    // 2. زر طلب الإذن وتفعيله من المودال
-    const enableNotifyBtn = document.getElementById('enable-notify-btn');
-    if (enableNotifyBtn) {
-        enableNotifyBtn.addEventListener('click', () => {
-            if (!("Notification" in window)) {
-                alert("عذراً، متصفحك لا يدعم الإشعارات.");
-            } else {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        enableNotifyBtn.textContent = "تم التفعيل ✓";
-                        enableNotifyBtn.style.backgroundColor = "#22c55e";
-                        enableNotifyBtn.disabled = true;
-                        notificationSettings.enabled = true;
-                        new Notification("محاسبة النفس", { body: "تم تفعيل التنبيهات بنجاح، سنذكرك بالخير دائماً." });
-                    } else {
-                        alert("يجب السماح بالإشعارات لتذكيرك.");
-                    }
-                });
-            }
-        });
-    }
-
-
     // تحميل الإعدادات عند فتح الموقع
     const savedNotifSettings = localStorage.getItem('notification_settings');
     if (savedNotifSettings) {
