@@ -3271,72 +3271,85 @@ html[data-theme="dark"] .insight-box:hover {
     }
 }
 /* ========================================= */
-/* إصلاح جذري لنافذة "كيف يُحتسب تقدم اليوم؟" */
+/* إصلاح قائمة "كيف يحتسب التقدم" على الموبايل */
 /* ========================================= */
 .header-progress-info-popup {
-    background-color: var(--bg-primary) !important; /* لون مصمت لمنع تداخل النصوص */
-    backdrop-filter: none !important; /* إلغاء الشفافية الزجاجية المزعجة هنا */
+    background-color: var(--bg-primary) !important; /* خلفية صلبة لمنع تداخل النصوص */
+    backdrop-filter: none !important; /* إلغاء الشفافية الزجاجية المزعجة */
     -webkit-backdrop-filter: none !important;
     border: 2px solid var(--accent-color) !important;
-    border-radius: 1rem;
-    z-index: 9999 !important;
+    border-radius: 1.2rem;
+    z-index: 99999 !important; /* طبقة عليا فوق كل شيء */
     padding: 1.5rem !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    width: 320px;
 }
 
-/* لون غامق صريح في الوضع الليلي */
+/* لون مريح ومتناسق في الوضع الليلي */
 html[data-theme="dark"] .header-progress-info-popup {
     background-color: #1e293b !important; 
+    border-color: var(--accent-color) !important;
 }
 
-/* تنسيق رأس النافذة */
+/* تنسيق الهيدر الداخلي للنافذة */
 .header-progress-info-popup .popup-header {
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--glass-border) !important;
+    padding-bottom: 0.75rem;
     margin-bottom: 1rem;
 }
 
 .header-progress-info-popup .popup-header h4 {
     color: var(--accent-color);
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    margin: 0;
 }
 
-/* زر الإغلاق */
-#close-header-progress-info {
-    font-size: 2rem;
-    color: #ef4444;
-    transition: transform 0.3s ease;
-    line-height: 1;
-}
-#close-header-progress-info:hover {
-    transform: scale(1.2);
-}
-
-/* تحسين شكل صفوف النسب الداخلية لتبدو كقائمة منظمة */
+/* تنسيق صفوف النسب المئوية الداخلية لتبدو كبطاقات مدمجة */
 .progress-info-row {
-    background: rgba(128, 128, 128, 0.1);
-    padding: 8px 12px !important;
-    border-radius: 6px;
-    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    background: rgba(128, 128, 128, 0.08);
+    padding: 10px 14px !important;
+    border-radius: 8px;
+    margin-bottom: 8px;
     border-bottom: none !important;
     font-weight: 600;
+    font-size: 0.9rem;
 }
 
-/* التوسيط والتعتيم على الموبايل والتابلت */
+/* زر الإغلاق المطور (X) */
+#close-header-progress-info {
+    font-size: 1.8rem;
+    color: #ef4444;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+/* ========================================= */
+/* التحكم الذكي والظهور المُلائم في الموبايل  */
+/* ========================================= */
 @media (max-width: 768px) {
     .header-progress-info-popup {
-        position: fixed !important;
+        position: fixed !important; /* تغيير إلى fixed ليفصل نفسه عن الهيدر تماماً */
         top: 50% !important;
         left: 50% !important;
         right: auto !important;
-        transform: translate(-50%, -50%) !important;
-        width: 92vw !important;
-        max-width: 380px !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) !important; /* توسيط هندسي كامل في شاشة الموبايل */
+        width: 90vw !important; /* يأخذ 90% من عرض الشاشة تلقائياً */
+        max-width: 360px !important; /* أقصى عرض ليبقى ملموماً وأنيقاً */
+        box-sizing: border-box !important;
     }
     
-    /* خدعة رائعة: إضافة ظل كبير جداً ليعمل كخلفية معتمة (Overlay) خلف النافذة */
+    /* إضافة خلفية معتمة (Overlay) خلف القائمة لتبدو كالمودال الاحترافي وتخفي العجنة */
     .header-progress-info-popup:not(.hidden) {
-        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.6), 0 15px 40px rgba(0,0,0,0.5) !important;
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.7), 0 20px 40px rgba(0,0,0,0.6) !important;
     }
 }
