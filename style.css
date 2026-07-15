@@ -3270,3 +3270,73 @@ html[data-theme="dark"] .insight-box:hover {
         display: none !important;
     }
 }
+/* ========================================= */
+/* إصلاح جذري لنافذة "كيف يُحتسب تقدم اليوم؟" */
+/* ========================================= */
+.header-progress-info-popup {
+    background-color: var(--bg-primary) !important; /* لون مصمت لمنع تداخل النصوص */
+    backdrop-filter: none !important; /* إلغاء الشفافية الزجاجية المزعجة هنا */
+    -webkit-backdrop-filter: none !important;
+    border: 2px solid var(--accent-color) !important;
+    border-radius: 1rem;
+    z-index: 9999 !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* لون غامق صريح في الوضع الليلي */
+html[data-theme="dark"] .header-progress-info-popup {
+    background-color: #1e293b !important; 
+}
+
+/* تنسيق رأس النافذة */
+.header-progress-info-popup .popup-header {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.header-progress-info-popup .popup-header h4 {
+    color: var(--accent-color);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+/* زر الإغلاق */
+#close-header-progress-info {
+    font-size: 2rem;
+    color: #ef4444;
+    transition: transform 0.3s ease;
+    line-height: 1;
+}
+#close-header-progress-info:hover {
+    transform: scale(1.2);
+}
+
+/* تحسين شكل صفوف النسب الداخلية لتبدو كقائمة منظمة */
+.progress-info-row {
+    background: rgba(128, 128, 128, 0.1);
+    padding: 8px 12px !important;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    border-bottom: none !important;
+    font-weight: 600;
+}
+
+/* التوسيط والتعتيم على الموبايل والتابلت */
+@media (max-width: 768px) {
+    .header-progress-info-popup {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: 92vw !important;
+        max-width: 380px !important;
+    }
+    
+    /* خدعة رائعة: إضافة ظل كبير جداً ليعمل كخلفية معتمة (Overlay) خلف النافذة */
+    .header-progress-info-popup:not(.hidden) {
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.6), 0 15px 40px rgba(0,0,0,0.5) !important;
+    }
+}
