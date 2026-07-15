@@ -62,13 +62,7 @@
             <button id="header-progress-info-btn" class="header-progress-info-btn" aria-label="كيف يتم احتساب التقدم؟">
                 <i class="fa-solid fa-circle-question"></i>
             </button>
-            <div id="header-progress-info-popup" class="header-progress-info-popup hidden">
-                <div class="popup-header">
-                    <h4>كيف يُحتسب تقدم اليوم؟</h4>
-                    <button id="close-header-progress-info" class="close-small">&times;</button>
-                </div>
-                <div class="popup-body" id="header-progress-info-content"></div>
-            </div>
+            
       </div>
 
       <div class="header-actions">
@@ -988,6 +982,19 @@
       <div id="concept-modal-video" class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; border: 1px solid var(--glass-border);">
         </div>
     </div>
+  </div>
+</div>
+
+  <div id="header-progress-info-popup" class="modal-overlay hidden" style="z-index: 99999;">
+  <div class="liquid-modal" style="max-width: 400px; width: 90%;">
+    <div class="modal-header" style="border-bottom: 1px dashed var(--glass-border); padding-bottom: 10px;">
+      <h3 style="color: var(--accent-color); font-size: 1.1rem; margin: 0;">
+        <i class="fa-solid fa-chart-pie"></i> كيف يُحتسب تقدم اليوم؟
+      </h3>
+      <button id="close-header-progress-info" class="close-btn">&times;</button>
+    </div>
+    <div class="modal-body" id="header-progress-info-content" style="padding-top: 15px;">
+      </div>
   </div>
 </div>
 
