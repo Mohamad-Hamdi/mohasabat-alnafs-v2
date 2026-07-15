@@ -3274,24 +3274,22 @@ html[data-theme="dark"] .insight-box:hover {
 /* إصلاح قائمة "كيف يحتسب التقدم" على الموبايل */
 /* ========================================= */
 .header-progress-info-popup {
-    background-color: var(--bg-primary) !important; /* خلفية صلبة لمنع تداخل النصوص */
-    backdrop-filter: none !important; /* إلغاء الشفافية الزجاجية المزعجة */
+    background-color: var(--bg-primary) !important; 
+    backdrop-filter: none !important; 
     -webkit-backdrop-filter: none !important;
     border: 2px solid var(--accent-color) !important;
     border-radius: 1.2rem;
-    z-index: 99999 !important; /* طبقة عليا فوق كل شيء */
+    z-index: 99999 !important; 
     padding: 1.5rem !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
     width: 320px;
 }
 
-/* لون مريح ومتناسق في الوضع الليلي */
 html[data-theme="dark"] .header-progress-info-popup {
     background-color: #1e293b !important; 
     border-color: var(--accent-color) !important;
 }
 
-/* تنسيق الهيدر الداخلي للنافذة */
 .header-progress-info-popup .popup-header {
     display: flex;
     justify-content: space-between;
@@ -3308,7 +3306,6 @@ html[data-theme="dark"] .header-progress-info-popup {
     margin: 0;
 }
 
-/* تنسيق صفوف النسب المئوية الداخلية لتبدو كبطاقات مدمجة */
 .progress-info-row {
     display: flex;
     justify-content: space-between;
@@ -3321,7 +3318,6 @@ html[data-theme="dark"] .header-progress-info-popup {
     font-size: 0.9rem;
 }
 
-/* زر الإغلاق المطور (X) */
 #close-header-progress-info {
     font-size: 1.8rem;
     color: #ef4444;
@@ -3337,18 +3333,17 @@ html[data-theme="dark"] .header-progress-info-popup {
 /* ========================================= */
 @media (max-width: 768px) {
     .header-progress-info-popup {
-        position: fixed !important; /* تغيير إلى fixed ليفصل نفسه عن الهيدر تماماً */
+        position: fixed !important; 
         top: 50% !important;
         left: 50% !important;
         right: auto !important;
         bottom: auto !important;
-        transform: translate(-50%, -50%) !important; /* توسيط هندسي كامل في شاشة الموبايل */
-        width: 90vw !important; /* يأخذ 90% من عرض الشاشة تلقائياً */
-        max-width: 360px !important; /* أقصى عرض ليبقى ملموماً وأنيقاً */
+        transform: translate(-50%, -50%) !important; 
+        width: 90vw !important; 
+        max-width: 360px !important; 
         box-sizing: border-box !important;
     }
     
-    /* إضافة خلفية معتمة (Overlay) خلف القائمة لتبدو كالمودال الاحترافي وتخفي العجنة */
     .header-progress-info-popup:not(.hidden) {
         box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.7), 0 20px 40px rgba(0,0,0,0.6) !important;
     }
