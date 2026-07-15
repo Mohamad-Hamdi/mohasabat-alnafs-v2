@@ -176,11 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
             headerProgressInfoPopup.classList.add('hidden');
         });
     }
-    document.addEventListener('click', (e) => {
-        if (headerProgressInfoPopup && !headerProgressInfoPopup.classList.contains('hidden')) {
-            if (!headerProgressInfoPopup.contains(e.target) && e.target !== headerProgressInfoBtn) {
-                headerProgressInfoPopup.classList.add('hidden');
-            }
+// إغلاق نافذة التقدم عند الضغط في الخارج
+    window.addEventListener('click', (e) => {
+        if (e.target === headerProgressInfoPopup) {
+            headerProgressInfoPopup.classList.add('hidden');
         }
     });
 
