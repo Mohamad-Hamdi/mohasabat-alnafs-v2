@@ -335,55 +335,6 @@ function kuwaitiCalendar(date) {
     };
 }
 
-// =========================================
-    // نظام الإشعارات المتوافق مع الموبايل (PWA)
-    // =========================================
-    
-    let swRegistration = null;
-
-    // 1. تسجيل الـ Service Worker
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        navigator.serviceWorker.register('sw.js')
-        .then(function(swReg) {
-            console.log('Service Worker is registered', swReg);
-            swRegistration = swReg;
-        })
-        .catch(function(error) {
-            console.error('Service Worker Error', error);
-        });
-    }
-
-    // 2. طلب صلاحية إرسال الإشعارات
-    function requestNotificationPermission() {
-        if (!('Notification' in window)) {
-            console.log('هذا المتصفح لا يدعم الإشعارات');
-            return;
-        }
-        
-        Notification.requestPermission().then((permission) => {
-            if (permission === 'granted') {
-                console.log('تم إعطاء صلاحية الإشعارات بنجاح!');
-                // إرسال إشعار ترحيبي تجريبي
-                sendLocalNotification('محاسبة النفس', 'تم تفعيل الإشعارات بنجاح. سنقوم بتذكيرك بأورادك!');
-            } else {
-                console.log('تم رفض صلاحية الإشعارات');
-            }
-        });
-    }
-
-    // 3. دالة إرسال الإشعار الذكية
-    function sendLocalNotification(title, body) {
-        if (Notification.permission === 'granted' && swRegistration) {
-            const options = {
-                body: body,
-                icon: 'logo.png',
-                vibrate: [200, 100, 200], // اهتزاز الموبايل
-                badge: 'logo.png',
-                data: { url: window.location.href }
-            };
-            swRegistration.showNotification(title, options);
-        }
-    }
 
 
     // --- Theme Logic ---
@@ -4236,3 +4187,64 @@ document.getElementById('concept-modal').addEventListener('click', function(e) {
         closeConceptModal();
     }
 }); 
+// =========================================
+// نظام الإشعارات المتوافق مع الكمبيوتر والموبايل (PWA)
+// =========================================
+
+let swRegistration = null;
+
+// 1. تسجيل الـ Service Worker (لعمل الإشعارات في الخلفية للموبايل)
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.register('sw.js')
+    .then(function(swReg) {
+        console.log('Service Worker is registered', swReg);
+        swRegistration = swReg;
+    })
+    .catch(function(error) {
+        console.error('Service Worker Error', error);
+    });
+}
+
+// 2. طلب صلاحية إرسال الإشعارات (مربوطة بـ window لكي يراها الـ HTML)
+window.requestNotificationPermission = function() {
+    if (!('Notification' in window)) {
+        alert('عذراً، متصفحك أو جهازك لا يدعم الإشعارات.');
+        return;
+    }
+    
+    Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+            // تغيير شكل الزر لتأكيد التفعيل
+            const btn = document.querySelector('button[onclick="requestNotificationPermission()"]');
+            if(btn) {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> تم التفعيل بنجاح';
+                btn.style.background = '#22c55e';
+            }
+            
+            // إرسال إشعار تجريبي فوري للتأكد من عملها
+            window.sendLocalNotification('محاسبة النفس', 'تم التفعيل! سنذكرك بأورادك طالما التطبيق يعمل.');
+        } else {
+            alert('تم رفض الإشعارات. يرجى السماح بها من إعدادات المتصفح.');
+        }
+    });
+};
+
+// 3. دالة إرسال الإشعار الذكية (تدعم الحالتين: موبايل ولابتوب)
+window.sendLocalNotification = function(title, body) {
+    if (Notification.permission === 'granted') {
+        const options = {
+            body: body,
+            icon: 'logo.png', // تأكد أن لديك صورة بهذا الاسم في مجلد المشروع
+            badge: 'logo.png',
+            vibrate: [200, 100, 200]
+        };
+
+        // محاولة الإرسال عبر الـ Service Worker (الأفضل للموبايل)
+        if (typeof swRegistration !== 'undefined' && swRegistration && swRegistration.showNotification) {
+            swRegistration.showNotification(title, options);
+        } else {
+            // الطريقة الاحتياطية العادية (للكمبيوتر)
+            new Notification(title, options);
+        }
+    }
+};
