@@ -3995,9 +3995,12 @@ function runDailyAnalysis(force = false) {
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // إضافة زر "إعادة الجولة" داخل قائمة الإعدادات (مرة واحدة)
+    // التحقق مما إذا كان الجهاز موبايل (عرض الشاشة أصغر من أو يساوي 768 بكسل)
+    const isMobileDevice = window.innerWidth <= 768;
+
+    // إضافة زر "إعادة الجولة" داخل قائمة الإعدادات (للشاشات الكبيرة فقط)
     const setupModalBody = document.querySelector('#setup-modal .modal-body');
-    if(setupModalBody && !document.getElementById('restart-tour-btn')) {
+    if(setupModalBody && !document.getElementById('restart-tour-btn') && !isMobileDevice) {
         const restartBtn = document.createElement('button');
         restartBtn.id = 'restart-tour-btn';
         restartBtn.className = 'btn-primary';
@@ -4006,8 +4009,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         restartBtn.onclick = () => {
             document.getElementById('setup-modal').classList.add('hidden');
-            if (window.innerWidth < 600) document.getElementById('action-icons').classList.add('show-mobile');
-            startAppTour();
+            if (typeof startAppTour === 'function') startAppTour();
         };
         setupModalBody.appendChild(restartBtn);
     }
@@ -4016,14 +4018,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const tourSeen = localStorage.getItem('tour_seen_v2');
     
     if (!tourSeen) {
-        // الحالة 1: المستخدم يفتح لأول مرة بعد التحديث -> شغل الجولة
-        setTimeout(startAppTour, 1500);
-        // منع ظهور رسالة "افتقدناك" في هذا اليوم لعدم التشتيت
+        // منع ظهور المحلل الذكي في أول يوم لعدم التشتيت
         const todayStr = new Date().toLocaleDateString('en-CA');
         localStorage.setItem('last_smart_check_date', todayStr);
 
+        if (isMobileDevice) {
+            // الحالة 1 (موبايل): تخطي الجولة نهائياً وتسجيلها كمقروءة
+            localStorage.setItem('tour_seen_v2', 'true');
+            localStorage.setItem('tour_completed', 'true');
+            
+            // إظهار رسالة تثبيت التطبيق (PWA) للموبايل بصمت بعد 3 ثوانٍ من فتح الموقع
+            setTimeout(() => {
+                if (typeof deferredPrompt !== 'undefined' && deferredPrompt) {
+                    deferredPrompt.prompt();
+                } else if (typeof enableInstallButton === 'function') {
+                    enableInstallButton();
+                }
+            }, 3000);
+
+        } else {
+            // الحالة 2 (لابتوب): تشغيل الجولة التعريفية بشكل طبيعي
+            setTimeout(() => {
+                if (typeof startAppTour === 'function') startAppTour();
+            }, 1500);
+        }
+
     } else {
-        // الحالة 2: المستخدم قديم -> شغل المحلل الذكي
+        // الحالة 3: مستخدم قديم (رأى الجولة مسبقاً) -> شغل المحلل الذكي
         setTimeout(() => {
             if (typeof runDailyAnalysis === 'function') runDailyAnalysis(); 
         }, 2000);
