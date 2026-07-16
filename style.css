@@ -2973,11 +2973,17 @@ main {
     font-size: 28px !important;
     text-shadow: 0 0 5px rgba(255,255,255,0.5) !important;
     top: 5px !important;
-    right: 5px !important;
+    left: 10px !important; /* النقل لجهة الشمال */
+    right: auto !important; /* إلغاء التموضع القديم على اليمين */
     opacity: 1 !important;
+    background: none !important; /* للتأكد من عدم وجود خلفية مربعة مزعجة */
+    border: none !important;
 }
-.driver-popover-close-btn:hover { color: #b91c1c !important; transform: scale(1.2); }
 
+.driver-popover-close-btn:hover { 
+    color: #b91c1c !important; 
+    transform: scale(1.2); 
+}
 /* ========================================= */
 /* إصلاح قائمة التقويم المزدوج على الموبايل  */
 /* ========================================= */
