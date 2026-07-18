@@ -1497,6 +1497,27 @@ main {
     margin: 0;
 }
 
+/* --- Niyyat (جدد نواياك) Section Styles --- */
+
+.niyya-box {
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    border: 1px solid #10b981 !important;
+}
+
+.niyya-box:hover {
+    background-color: rgba(5, 150, 105, 0.25) !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
+    border-color: #6ee7b7 !important;
+}
+
+.niyya-icon {
+    color: #6ee7b7 !important;
+}
+
+.niyya-box:hover .niyya-icon {
+    color: #fff !important;
+}
+
 /* --- Warning Modal Content --- */
 .warning-modal-content {
     border: 1px solid #ef4444; 
