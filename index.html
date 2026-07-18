@@ -986,6 +986,10 @@
     const db = firebase.firestore();
     const provider = new firebase.auth.GoogleAuthProvider();
   </script>
+  <!-- Capacitor: هذين السكريبتين بيبقوا موجودين تلقائيًا بعد ما تعمل npx cap sync -
+       لو الموقع اتفتح في متصفح عادي (مش جوه التطبيق) هيفشلوا في التحميل بهدوء ومش هيأثروا على حاجة -->
+  <script src="capacitor.js" defer></script>
+  <script src="native-notifications.js" defer></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
   <script src="script.js" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
