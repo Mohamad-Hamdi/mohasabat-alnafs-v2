@@ -608,7 +608,15 @@ if (saveSetupBtn) {
             .then(() => {
                 // حفظ محلي أيضاً للسرعة
                 localStorage.setItem('notification_settings', JSON.stringify(notificationSettings));
-                
+
+                // لو شغالين جوه تطبيق أندرويد (Capacitor)، بنجدول إشعارات حقيقية
+                // على مستوى النظام بتشتغل حتى لو التطبيق مقفول تمامًا
+                if (window.isNativeApp && window.isNativeApp() && notificationSettings.enabled) {
+                    window.scheduleDailyNotification('morning', 'أذكار الصباح', 'بداية يوم مبارك بذكر الله.', notificationSettings.morningTime);
+                    window.scheduleDailyNotification('evening', 'أذكار المساء', 'حصّن نفسك قبل الغروب.', notificationSettings.eveningTime);
+                    window.scheduleDailyNotification('wird', 'الورد القرآني', 'لا تهجر القرآن، ولو صفحة واحدة.', notificationSettings.wirdTime);
+                }
+
                 setupModal.classList.add('hidden');
                 applyUserProfileSettings(); 
                 updateUI(user);
@@ -706,6 +714,13 @@ if (saveSetupBtn) {
                 
                 // تحديث التخزين المحلي
                 localStorage.setItem('notification_settings', JSON.stringify(notificationSettings));
+
+                // لو جوه تطبيق أندرويد وكانت التنبيهات مفعّلة، أعد جدولتها على مستوى النظام
+                if (window.isNativeApp && window.isNativeApp() && notificationSettings.enabled) {
+                    window.scheduleDailyNotification('morning', 'أذكار الصباح', 'بداية يوم مبارك بذكر الله.', notificationSettings.morningTime);
+                    window.scheduleDailyNotification('evening', 'أذكار المساء', 'حصّن نفسك قبل الغروب.', notificationSettings.eveningTime);
+                    window.scheduleDailyNotification('wird', 'الورد القرآني', 'لا تهجر القرآن، ولو صفحة واحدة.', notificationSettings.wirdTime);
+                }
             }
 
         }).catch(err => console.error("Error fetching user data:", err));
@@ -2277,9 +2292,13 @@ function saveExtras() {
         document.getElementById('setup-wird-time').value = notificationSettings.wirdTime;
     }
 
-    // 4. الدالة الرئيسية: المراقب الدوري (يعمل كل دقيقة)
+    // 4. الدالة الرئيسية: المراقب الدوري (يعمل كل دقيقة، وده بيشتغل بس والتطبيق مفتوح فعليًا -
+    //    التنبيهات اليومية الثابتة (صباح/مساء/ورد) بقت متجدولة native في التطبيق، أما تنبيه
+    //    الصلاة والمناسبات هنا فلسه بيعتمد على إن الصفحة تكون مفتوحة)
     setInterval(() => {
-        if (Notification.permission !== "granted") return;
+        const nativeApp = window.isNativeApp && window.isNativeApp();
+        if (!nativeApp && Notification.permission !== "granted") return;
+        if (nativeApp && !notificationSettings.enabled) return;
 
         const now = new Date();
         const currentHours = String(now.getHours()).padStart(2, '0');
@@ -2311,11 +2330,13 @@ function saveExtras() {
 
     // دالة إرسال الإشعار
     function sendNotification(title, body) {
-        const notif = new Notification(title, {
-            body: body,
-            icon: 'path/to/icon.png', // يمكنك وضع مسار أيقونة موقعك
-            dir: 'rtl'
-        });
+        // بنمرر عبر الجسر الموحّد: لو جوه تطبيق أندرويد هيستخدم الإشعار native،
+        // ولو متصفح عادي هيستخدم Notification زي ما كان
+        if (window.sendLocalNotification) {
+            window.sendLocalNotification(title, body);
+        } else {
+            new Notification(title, { body: body, icon: 'path/to/icon.png', dir: 'rtl' });
+        }
     }
 
     // منطق فحص عبادات الغد
@@ -3632,12 +3653,12 @@ function runDailyAnalysis(force = false) {
         // 3. عرض النافذة والإشعار
         showSmartPopup(icon, title, body, analysis);
 
-        if (Notification.permission === "granted" && !force) {
-            new Notification(title, {
-                body: body,
-                icon: 'logo.png',
-                dir: 'rtl' 
-            });
+        if (!force && ((window.isNativeApp && window.isNativeApp()) || Notification.permission === "granted")) {
+            if (window.sendLocalNotification) {
+                window.sendLocalNotification(title, body);
+            } else {
+                new Notification(title, { body: body, icon: 'logo.png', dir: 'rtl' });
+            }
         }
 
         // 4. تسجيل أننا عرضنا التقرير اليوم (عشان ميظهرش تاني لنفس اليوم)
@@ -4213,6 +4234,23 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 
 // 2. طلب صلاحية إرسال الإشعارات (مربوطة بـ window لكي يراها الـ HTML)
 window.requestNotificationPermission = function() {
+    // لو جوه تطبيق أندرويد (Capacitor)، استخدم طلب الإذن الأصلي بتاع النظام
+    if (window.isNativeApp && window.isNativeApp()) {
+        window.requestNotificationPermissionUnified().then((granted) => {
+            if (granted) {
+                const btn = document.querySelector('button[onclick="requestNotificationPermission()"]');
+                if(btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> تم التفعيل بنجاح';
+                    btn.style.background = '#22c55e';
+                }
+                window.sendLocalNotification('محاسبة النفس', 'تم التفعيل! هتوصلك تنبيهاتك حتى لو التطبيق مقفول.');
+            } else {
+                alert('تم رفض الإشعارات. يرجى السماح بها من إعدادات التطبيق على جهازك.');
+            }
+        });
+        return;
+    }
+
     if (!('Notification' in window)) {
         alert('عذراً، متصفحك أو جهازك لا يدعم الإشعارات.');
         return;
@@ -4235,8 +4273,14 @@ window.requestNotificationPermission = function() {
     });
 };
 
-// 3. دالة إرسال الإشعار الذكية (تدعم الحالتين: موبايل ولابتوب)
+// 3. دالة إرسال الإشعار الذكية (تدعم الحالات: تطبيق أندرويد، موبايل ويب، ولابتوب)
 window.sendLocalNotification = function(title, body) {
+    // لو جوه تطبيق أندرويد، استخدم الإشعار الأصلي بتاع النظام (بيشتغل حتى لو التطبيق مقفول)
+    if (window.isNativeApp && window.isNativeApp()) {
+        window.sendLocalNotificationUnified(title, body);
+        return;
+    }
+
     if (Notification.permission === 'granted') {
         const options = {
             body: body,
@@ -4244,6 +4288,7 @@ window.sendLocalNotification = function(title, body) {
             badge: 'logo.png',
             vibrate: [200, 100, 200]
         };
+
 
         // محاولة الإرسال عبر الـ Service Worker (الأفضل للموبايل)
         if (typeof swRegistration !== 'undefined' && swRegistration && swRegistration.showNotification) {
