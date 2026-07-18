@@ -4163,11 +4163,17 @@ function openConcept(conceptId) {
 
     // تعبئة البيانات في النافذة
     document.querySelector('#concept-modal-title span').textContent = data.title;
-    document.getElementById('concept-modal-text').textContent = data.text;
+    document.getElementById('concept-modal-text').textContent = data.text || '';
     
-    // حقن الفيديو
+    // حقن الفيديو (لو موجود فقط، وإلا نخفي الحاوية)
     const videoContainer = document.getElementById('concept-modal-video');
-    videoContainer.innerHTML = `<iframe src="${data.video}" title="${data.title}" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px;"></iframe>`;
+    if (data.video && data.video.trim() !== '') {
+        videoContainer.style.display = 'block';
+        videoContainer.innerHTML = `<iframe src="${data.video}" title="${data.title}" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px;"></iframe>`;
+    } else {
+        videoContainer.style.display = 'none';
+        videoContainer.innerHTML = '';
+    }
     
     // إظهار النافذة
     document.getElementById('concept-modal').classList.remove('hidden');
@@ -4249,3 +4255,83 @@ window.sendLocalNotification = function(title, body) {
     }
 };
 
+
+
+async function loadNiyyatSection() {
+    try {
+        // بنطلب البيانات من الوثيقة اللي هنكريتها في فايربيس
+        const docRef = db.collection("app_settings").doc("niyyat_section");
+        const doc = await docRef.get();
+
+        const niyyatContainer = document.getElementById('niyyat-section-container');
+        if (!niyyatContainer) return;
+
+        if (!doc.exists) {
+            niyyatContainer.style.display = 'none';
+            return;
+        }
+
+        const data = doc.data();
+
+        // 1. لو أنت عامل إخفاء للقسم من لوحة التحكم، هنخفيه من الواجهة
+        if (data.isVisible === false) {
+            niyyatContainer.style.display = 'none';
+            return; // بنوقف الكود هنا
+        }
+        niyyatContainer.style.display = 'block';
+
+        // 2. تجهيز قائمة العناصر (بتدعم الشكل الجديد "items" وكمان الشكل القديم "intentions" كنص فقط)
+        let items = [];
+        if (Array.isArray(data.items) && data.items.length > 0) {
+            items = data.items;
+        } else if (Array.isArray(data.intentions)) {
+            // شكل قديم: كانت كل نية عبارة عن نص فقط بدون فيديو أو أيقونة
+            items = data.intentions.map((text, i) => ({
+                id: 'legacy_' + i,
+                title: text,
+                text: '',
+                video: '',
+                icon: 'fa-solid fa-star'
+            }));
+        }
+
+        // 3. بناء الواجهة: عنوان القسم + شبكة من الكروت القابلة للضغط
+        let htmlContent = `<h4 class="box-title" style="color: #10b981; margin-bottom: 0.75rem; font-size: 1.19rem;"><i class="fa-solid fa-lightbulb"></i> ${data.title || 'جدد نواياك'}</h4>`;
+
+        if (items.length === 0) {
+            niyyatContainer.innerHTML = htmlContent;
+            return;
+        }
+
+        htmlContent += `<div class="warning-grid niyyat-grid" style="grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">`;
+
+        items.forEach((item, index) => {
+            const itemId = item.id || ('niyya_' + index);
+            const conceptKey = 'niyya_' + itemId;
+
+            // بنسجل بيانات كل عنصر جوه conceptsData عشان نافذة openConcept تقدر تعرضها
+            conceptsData[conceptKey] = {
+                title: item.title || '',
+                text: item.text || '',
+                video: item.video || ''
+            };
+
+            const icon = item.icon || 'fa-solid fa-star';
+            htmlContent += `
+                <div class="warning-box niyya-box" onclick="openConcept('${conceptKey}')" style="padding: 1rem 0.5rem; gap: 0.5rem;">
+                    <i class="${icon} warning-icon niyya-icon" style="font-size: 1.5rem;"></i>
+                    <h3 class="warning-title" style="font-size: 0.85rem;">${item.title || ''}</h3>
+                </div>`;
+        });
+
+        htmlContent += `</div>`;
+
+        // 4. بنطبع الـ HTML الجديد ده جوه الديف الفاضي
+        niyyatContainer.innerHTML = htmlContent;
+    } catch (error) {
+        console.error("خطأ في جلب بيانات النوايا:", error);
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    loadNiyyatSection();
+});
