@@ -971,6 +971,22 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+  <script>
+      // --- 1. إعدادات Firebase ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8ltXQrl8XhRbjLlOfr5QiTGx_IQMan3U",
+        authDomain: "mohasba-app.firebaseapp.com",
+        projectId: "mohasba-app",
+        storageBucket: "mohasba-app.firebasestorage.app",
+        messagingSenderId: "24957282420",
+        appId: "1:24957282420:web:982d83e0e0b1f7d6da8921"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+  </script>
   <script src="script.js" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
