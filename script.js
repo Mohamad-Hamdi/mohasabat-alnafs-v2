@@ -436,7 +436,7 @@ function updateHeaderOnScroll() {
     // --- 1. إعدادات Firebase ---
     const firebaseConfig = {
         apiKey: "AIzaSyD8ltXQrl8XhRbjLlOfr5QiTGx_IQMan3U",
-        authDomain: "mohasba-app.firebaseapp.com",
+        authDomain: "mohasabat-alnafs.vercel.app",
         projectId: "mohasba-app",
         storageBucket: "mohasba-app.firebasestorage.app",
         messagingSenderId: "24957282420",
@@ -448,17 +448,39 @@ function updateHeaderOnScroll() {
     const db = firebase.firestore();
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    // --- 2. دالة تسجيل الدخول (معدلة للفحص) ---
-    loginBtn.addEventListener('click', () => {
-        auth.signInWithPopup(provider)
+    // كشف بيئة Capacitor (التطبيق) vs المتصفح العادي
+    const isCapacitor = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+
+    // معالجة نتيجة الـ redirect (للتطبيق فقط)
+    if (isCapacitor) {
+        auth.getRedirectResult()
             .then((result) => {
-                const user = result.user;
-                // لا نحدث الواجهة مباشرة، بل نفحص البروفايل أولاً
-                checkUserProfile(user);
+                if (result.user) {
+                    checkUserProfile(result.user);
+                }
             }).catch((error) => {
-                console.error("Error:", error.message);
+                console.error("Redirect Error:", error.message);
                 alert("حدث خطأ أثناء تسجيل الدخول: " + error.message);
             });
+    }
+
+    // --- 2. دالة تسجيل الدخول (معدلة للفحص) ---
+    loginBtn.addEventListener('click', () => {
+        if (isCapacitor) {
+            // في التطبيق: نستخدم signInWithRedirect لأن popup مش بيشتغل في WebView
+            auth.signInWithRedirect(provider);
+        } else {
+            // في المتصفح العادي: نفضل على signInWithPopup زي ما هو
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    // لا نحدث الواجهة مباشرة، بل نفحص البروفايل أولاً
+                    checkUserProfile(user);
+                }).catch((error) => {
+                    console.error("Error:", error.message);
+                    alert("حدث خطأ أثناء تسجيل الدخول: " + error.message);
+                });
+        }
     });
 
     // --- 3. دالة تسجيل الخروج ---
