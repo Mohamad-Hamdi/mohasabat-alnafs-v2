@@ -436,7 +436,7 @@ function updateHeaderOnScroll() {
     // --- 1. إعدادات Firebase ---
     const firebaseConfig = {
         apiKey: "AIzaSyD8ltXQrl8XhRbjLlOfr5QiTGx_IQMan3U",
-        authDomain: "mohasabat-alnafs.vercel.app",
+        authDomain: "mohasba-app.firebaseapp.com",
         projectId: "mohasba-app",
         storageBucket: "mohasba-app.firebasestorage.app",
         messagingSenderId: "24957282420",
